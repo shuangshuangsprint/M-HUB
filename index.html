@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>M HUB - 域名导航</title>
+    <style>
+        :root {
+            --bg-color: #eef2f3;
+            --text-color: #2d3436;
+            --accent-color: #0984e3;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --card-width: 280px;
+            --card-height: 160px;
+            --perspective: 1200px;
+            --radius: 400px;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- 头部 --- */
+        header {
+            padding: 30px 0 10px;
+            text-align: center;
+            z-index: 10;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2.2rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        h1 span { color: var(--accent-color); font-weight: 800; }
+
+        /* --- 3D 舞台 --- */
+        .scene {
+            flex: 1;
+            width: 100%;
+            perspective: var(--perspective);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            touch-action: none; /* 禁用默认手势，交给JS处理 */
+        }
+
+        .carousel {
+            width: var(--card-width);
+            height: var(--card-height);
+            position: absolute;
+            transform-style: preserve-3d;
+            transition: transform 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        /* --- 卡片 --- */
+        .card {
+            position: absolute;
+            width: var(--card-width);
+            height: var(--card-height);
+            background: var(--card-bg);
+            backdrop-filter: blur(10px); /* 毛玻璃效果 */
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+            backface-visibility: hidden;
+            text-decoration: none;
+            color: var(--text-color);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            opacity: 0.4;
+            transition: opacity 0.4s, transform 0.4s, box-shadow 0.4s;
+            user-select: none;
+        }
+
+        .card.active {
+            opacity: 1;
+            box-shadow: 0 15px 45px rgba(9, 132, 227, 0.3);
+            border: 1.5px solid var(--accent-color);
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            word-break: break-all;
+        }
+
+        .card-desc {
+            font-size: 0.85rem;
+            color: #636e72;
+            line-height: 1.4;
+        }
+
+        /* --- 控件 --- */
+        .controls {
+            padding: 20px;
+            display: flex;
+            gap: 40px;
+            z-index: 20;
+            margin-bottom: calc(20px + env(safe-area-inset-bottom));
+        }
+
+        .btn {
+            background: white;
+            border: none;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .btn:active { transform: scale(0.9); }
+
+        .tips {
+            position: absolute;
+            bottom: 10px;
+            font-size: 0.75rem;
+            color: #95a5a6;
+            pointer-events: none;
+        }
+
+        /* --- 移动端深度适配 --- */
+        @media (max-width: 768px) {
+            :root {
+                --card-width: 220px;
+                --card-height: 130px;
+                --perspective: 1000px;
+            }
+            h1 { font-size: 1.6rem; }
+            .card-title { font-size: 1.1rem; }
+            .btn { width: 50px; height: 50px; }
+            .controls { gap: 60px; } /* 增加间距防止误触 */
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1><span>M</span> HUB</h1>
+    </header>
+
+    <div class="scene" id="scene">
+        <div class="carousel" id="carousel"></div>
+    </div>
+
+    <div class="controls">
+        <button class="btn" id="prevBtn" aria-label="上一个">←</button>
+        <button class="btn" id="nextBtn" aria-label="下一个">→</button>
+    </div>
+
+    <div class="tips">左右滑动或点击卡片切换</div>
+
+    <script>
+        const domains = [
+            { title: 'gooooo.top', desc: '主域名入口', url: 'https://gooooo.top' },
+            { title: 'GitHub', desc: '开源代码托管', url: 'https://github.com' },
+            { title: 'ChatGPT', desc: '人工智能对话', url: 'https://chat.openai.com' },
+            { title: 'Bilibili', desc: '视频弹幕网站', url: 'https://www.bilibili.com' },
+            { title: 'Google', desc: '全球搜索', url: 'https://www.google.com' },
+            { title: 'YouTube', desc: '视频分享平台', url: 'https://www.youtube.com' }
+        ];
+
+        const carousel = document.getElementById('carousel');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        
+        let selectedIndex = 0;
+        const cellCount = domains.length;
+        const theta = 360 / cellCount;
+
+        function updateRadius() {
+            const cardWidth = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-width'));
+            // 响应式半径计算：在小屏上卡片更聚拢
+            const modifier = window.innerWidth < 768 ? 1.1 : 1.3;
+            const radius = Math.round((cardWidth / 2) / Math.tan(Math.PI / cellCount) * modifier);
+            document.documentElement.style.setProperty('--radius', `${radius}px`);
+            return radius;
+        }
+
+        function initCarousel() {
+            const radius = updateRadius();
+            carousel.innerHTML = ''; // 清空重新生成
+
+            domains.forEach((domain, index) => {
+                const card = document.createElement('a');
+                card.className = 'card';
+                card.href = domain.url;
+                card.target = "_blank";
+                card.innerHTML = `
+                    <div class="card-title">${domain.title}</div>
+                    <div class="card-desc">${domain.desc}</div>
+                `;
+
+                const angle = theta * index;
+                card.style.transform = `rotateY(${angle}deg) translateZ(${radius}px)`;
+                
+                // 处理点击逻辑
+                card.addEventListener('click', (e) => {
+                    let normalizedIndex = selectedIndex % cellCount;
+                    if (normalizedIndex < 0) normalizedIndex += cellCount;
+
+                    if (index !== normalizedIndex) {
+                        e.preventDefault();
+                        let diff = index - normalizedIndex;
+                        if (diff > cellCount / 2) diff -= cellCount;
+                        if (diff < -cellCount / 2) diff += cellCount;
+                        selectedIndex += diff;
+                        rotateCarousel();
+                    }
+                });
+                carousel.appendChild(card);
+            });
+            rotateCarousel();
+        }
+
+        function rotateCarousel() {
+            const angle = theta * selectedIndex * -1;
+            carousel.style.transform = `rotateY(${angle}deg)`;
+            
+            const cards = document.querySelectorAll('.card');
+            let activeIndex = selectedIndex % cellCount;
+            if (activeIndex < 0) activeIndex += cellCount;
+
+            cards.forEach((card, i) => {
+                card.classList.toggle('active', i === activeIndex);
+            });
+        }
+
+        // --- 交互控制 ---
+        prevBtn.onclick = () => { selectedIndex--; rotateCarousel(); };
+        nextBtn.onclick = () => { selectedIndex++; rotateCarousel(); };
+
+        // 滚轮控制 (防抖)
+        let timer;
+        window.onwheel = (e) => {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                if (e.deltaY > 0) selectedIndex++;
+                else selectedIndex--;
+                rotateCarousel();
+            }, 50);
+        };
+
+        // 触摸滑动 (优化版)
+        let startX = 0;
+        const scene = document.getElementById('scene');
+        
+        scene.ontouchstart = (e) => { startX = e.touches[0].clientX; };
+        scene.ontouchend = (e) => {
+            const endX = e.changedTouches[0].clientX;
+            const diff = startX - endX;
+            if (Math.abs(diff) > 50) { // 阈值
+                if (diff > 0) selectedIndex++;
+                else selectedIndex--;
+                rotateCarousel();
+            }
+        };
+
+        // 监听窗口大小变化
+        window.onresize = initCarousel;
+
+        // 初始化
+        initCarousel();
+    </script>
+</body>
+</html>
