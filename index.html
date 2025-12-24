@@ -3,28 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>M HUB - 域名导航</title>
+    <title>M HUB - 灵动导航</title>
     <style>
         :root {
-            --bg-color: #eef2f3;
             --text-color: #2d3436;
             --accent-color: #0984e3;
-            --card-bg: rgba(255, 255, 255, 0.9);
+            --card-bg: rgba(255, 255, 255, 0.85);
             --card-width: 260px;
             --card-height: 150px;
             --perspective: 1200px;
             
             /* 轮盘配置 */
-            --wheel-radius: 220px; /* 控制圆的大小 */
-            --wheel-bg-color: rgba(255, 255, 255, 0.15);
-            --wheel-border: rgba(255, 255, 255, 0.3);
+            --wheel-radius: 240px;
+            --wheel-border: rgba(255, 255, 255, 0.15);
+        }
+
+        /* 动态背景动画 */
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         body {
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            /* 4. 整体效果要灵动：添加流动渐变背景 */
+            background: linear-gradient(-45deg, #f5f7fa, #c3cfe2, #a1c4fd, #d4fc79);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
             color: var(--text-color);
             display: flex;
             flex-direction: column;
@@ -37,9 +45,10 @@
 
         /* --- 头部 --- */
         header {
-            padding: 40px 0 0;
+            padding: 40px 0 20px;
             text-align: center;
             z-index: 10;
+            transition: all 0.3s;
         }
 
         h1 {
@@ -48,6 +57,7 @@
             letter-spacing: 2px;
             text-transform: uppercase;
             opacity: 0.9;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         h1 span { color: var(--accent-color); font-weight: 800; }
 
@@ -68,7 +78,8 @@
             height: var(--card-height);
             position: absolute;
             transform-style: preserve-3d;
-            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+            /* 4. 灵动效果：使用更有弹性的贝塞尔曲线 */
+            transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         /* --- 卡片 --- */
@@ -77,9 +88,9 @@
             width: var(--card-width);
             height: var(--card-height);
             background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 16px;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px;
             box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
             display: flex;
             flex-direction: column;
@@ -91,131 +102,165 @@
             backface-visibility: hidden;
             text-decoration: none;
             color: var(--text-color);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            opacity: 0.3;
-            transition: all 0.5s;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            opacity: 0.25;
+            /* 4. 灵动效果：卡片自身的过渡也更有弹性 */
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
             cursor: pointer;
         }
 
         .card.active {
             opacity: 1;
-            box-shadow: 0 20px 50px rgba(9, 132, 227, 0.25);
-            border: 1.5px solid var(--accent-color);
-            transform: scale(1.05); /* 激活稍微放大 */
+            box-shadow: 0 25px 50px rgba(9, 132, 227, 0.3);
+            border: 2px solid rgba(9, 132, 227, 0.8);
+            /* 激活时轻微放大 */
+            transform: scale(1.08); 
         }
 
         .card-title {
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             font-weight: 700;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
         }
 
         .card-desc {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: #636e72;
+            font-weight: 500;
         }
 
         /* --- 左下角 1/4 轮盘 --- */
         .wheel-stage {
             position: fixed;
-            bottom: -50px; /* 稍微沉入屏幕边缘 */
-            left: -50px;
+            bottom: -60px;
+            left: -60px;
             width: calc(var(--wheel-radius) * 2);
             height: calc(var(--wheel-radius) * 2);
             z-index: 50;
             pointer-events: all;
-            touch-action: none; /* 阻止默认滚动 */
+            touch-action: none;
         }
 
-        /* 装饰背景圆 */
+        /* 3. 透明轮盘：去掉了背景色和浓重阴影，只留极细的装饰线 */
         .wheel-bg {
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
             border-radius: 50%;
             border: 1px solid var(--wheel-border);
-            background: radial-gradient(circle, rgba(255,255,255,0) 40%, var(--wheel-bg-color) 100%);
-            box-shadow: inset 0 0 40px rgba(255,255,255,0.4);
+            background: none; /* 透明背景 */
+            box-shadow: none;
             pointer-events: none;
+            opacity: 0.6;
         }
 
-        /* 旋转容器 */
         .wheel-content {
             width: 100%;
             height: 100%;
             position: relative;
             border-radius: 50%;
-            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+            /* 4. 灵动效果：轮盘旋转也用弹性过渡 */
+            transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        /* 域名项 (作为射线存在) */
         .wheel-item {
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 50%; /* 长度为半径 */
-            height: 0;  /* 高度为0，靠padding撑开文字 */
-            transform-origin: 0 0; /* 以圆心旋转 */
+            width: 50%;
+            height: 0;
+            transform-origin: 0 0;
             display: flex;
             align-items: center;
-            justify-content: flex-end; /* 文字靠圆周外侧 */
+            justify-content: flex-end;
             cursor: pointer;
+            pointer-events: none; /* 让点击事件穿透到文字盒子上 */
+        }
+        
+        .wheel-item > * {
+             pointer-events: auto; /* 恢复文字盒子的点击 */
         }
 
-        /* 文字样式：指向圆心 */
-        .wheel-text {
+        /* 3. 轮盘方框样式：给域名加上方框 */
+        .wheel-text-box {
             display: block;
-            padding-right: 35px; /* 距离圆边的距离 */
-            font-size: 13px;
+            /* 方框样式 */
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 10px 20px;
+            border-radius: 30px; /* 圆角方框 */
+            margin-right: 30px; /* 距离圆心的位置 */
+            
+            font-size: 14px;
             font-weight: 600;
             color: #636e72;
             text-transform: uppercase;
             letter-spacing: 1px;
-            opacity: 0.5;
-            transition: all 0.3s ease;
+            opacity: 0.7;
+            /* 4. 灵动效果：方框的激活过渡非常Q弹 */
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.26.5, 1.55);
             white-space: nowrap;
-            /* 关键：不旋转文字本身，让它沿着父容器的射线方向 */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
 
-        /* 激活高亮 */
-        .wheel-item.active .wheel-text {
+        /* 3. 滑动选择的对象加大：显著放大激活项 */
+        .wheel-item.active .wheel-text-box {
             color: var(--accent-color);
-            font-size: 18px;
+            background: rgba(255, 255, 255, 0.95);
+            border-color: var(--accent-color);
             opacity: 1;
             font-weight: 800;
-            padding-right: 25px; /* 激活时稍微向外突出一点 */
-            text-shadow: 0 0 15px rgba(255,255,255,0.8);
+            /* 核心：显著放大 1.5 倍，并稍微向外位移，突出显示 */
+            transform: scale(1.5) translateX(10px);
+            box-shadow: 0 10px 30px rgba(9, 132, 227, 0.4);
         }
 
         .tips {
             position: absolute;
-            bottom: 20px;
+            bottom: 30px;
             width: 100%;
             text-align: center;
-            font-size: 0.75rem;
-            color: #b2bec3;
+            font-size: 0.8rem;
+            color: #7f8c8d;
             pointer-events: none;
             z-index: 1;
+            opacity: 0.8;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.5);
         }
 
-        /* --- 移动端适配 --- */
+        /* --- 1. 适配不同页面，手机浏览器中心卡片被挡了 --- */
         @media (max-width: 768px) {
             :root {
-                --card-width: 220px;
-                --card-height: 130px;
-                --wheel-radius: 160px; /* 手机上稍微小一点 */
+                /* 适当减小卡片尺寸以适应小屏 */
+                --card-width: 210px;
+                --card-height: 125px;
+                --wheel-radius: 180px;
+            }
+            header {
+                /* 减少头部内边距 */
+                padding: 25px 0 10px;
+            }
+            .scene {
+                /* 关键：将整个 3D 场景向上偏移，防止被 Safari 等浏览器的底部栏或自身头部遮挡 */
+                transform: translateY(-30px);
+                /* 确保对齐 */
+                align-items: center; 
             }
             .wheel-stage {
-                bottom: -30px;
-                left: -30px;
+                bottom: -40px;
+                left: -40px;
             }
-            .wheel-text {
+            /* 手机端调整方框大小和间距 */
+            .wheel-text-box {
                 font-size: 12px;
-                padding-right: 25px;
+                padding: 8px 16px;
+                margin-right: 20px;
             }
-            .wheel-item.active .wheel-text {
-                font-size: 16px;
-                padding-right: 15px;
+            /* 手机端激活态也相应调整，保持放大效果 */
+            .wheel-item.active .wheel-text-box {
+                transform: scale(1.4) translateX(8px);
             }
         }
     </style>
@@ -236,11 +281,12 @@
             </div>
     </div>
 
-    <div class="tips">滑动屏幕或转动轮盘切换</div>
+    <div class="tips">滑动屏幕 · 转动轮盘</div>
 
     <script>
+        // 2. 域名home改为gooooo
         const domains = [
-            { title: 'Home', desc: '主页', url: 'https://gooooo.top' },
+            { title: 'gooooo', desc: '主页', url: 'https://gooooo.top' },
             { title: 'GitHub', desc: '代码', url: 'https://github.com' },
             { title: 'ChatGPT', desc: 'AI', url: 'https://chat.openai.com' },
             { title: 'Bilibili', desc: '视频', url: 'https://www.bilibili.com' },
@@ -265,7 +311,6 @@
                 card.className = 'card';
                 card.href = domain.url;
                 card.target = "_blank";
-                // 卡片上依然保留描述，但轮盘上只留标题
                 card.innerHTML = `
                     <div class="card-title">${domain.title}</div>
                     <div class="card-desc">${domain.desc}</div>
@@ -284,14 +329,13 @@
             domains.forEach((domain, index) => {
                 const item = document.createElement('div');
                 item.className = 'wheel-item';
-                // 轮盘上只显示 Site Name
-                item.innerHTML = `<span class="wheel-text">${domain.title}</span>`;
+                // 使用新的方框结构 span.wheel-text-box
+                item.innerHTML = `<span class="wheel-text-box">${domain.title}</span>`;
                 
-                // 设置每个项的初始角度 (0度在3点钟方向，顺时针增加)
-                // 我们让它们像车轮辐条一样散开
                 const angle = theta * index;
                 item.style.transform = `rotate(${angle}deg)`;
                 
+                // 点击事件绑定在 item 上，但通过 CSS 让 span 响应
                 item.onclick = () => rotateTo(index);
                 wheelContent.appendChild(item);
             });
@@ -302,8 +346,8 @@
 
         function updateLayout() {
             const cardWidth = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-width'));
-            // 3D 半径计算
-            const radius = Math.round((cardWidth / 2) / Math.tan(Math.PI / cellCount) * 1.5);
+            // 调整了计算系数，让卡片分布更合理
+            const radius = Math.round((cardWidth / 2) / Math.tan(Math.PI / cellCount) * 1.6);
             
             const cards = document.querySelectorAll('.card');
             cards.forEach((card, index) => {
@@ -321,6 +365,7 @@
         function rotateTo(targetIndex) {
             let currentIdx = getNormalizedIndex();
             let diff = targetIndex - currentIdx;
+            // 寻找最短路径
             if (diff > cellCount / 2) diff -= cellCount;
             if (diff < -cellCount / 2) diff += cellCount;
             selectedIndex += diff;
@@ -330,7 +375,7 @@
         function rotateAll() {
             const activeIndex = getNormalizedIndex();
 
-            // 1. 3D 卡片旋转
+            // 3D 卡片旋转
             const angleY = theta * selectedIndex * -1;
             carousel.style.transform = `rotateY(${angleY}deg)`;
             
@@ -338,14 +383,10 @@
                 card.classList.toggle('active', i === activeIndex);
             });
 
-            // 2. 轮盘旋转
-            // 目标：让当前激活项指向约 -45度 (左下角45度射线方向，视觉最佳位置)
-            // 0度是水平向右。-45度正好指向屏幕中心偏右上。
-            // 因为轮盘在左下角，文字是从圆心向外辐射的。
-            // 当我们想要看某个项时，这个项应该转到大约 -45deg 的位置。
-            const viewAngle = -45; 
+            // 轮盘旋转
+            // 调整最佳视角角度，使激活项指向左上侧方
+            const viewAngle = -35; 
             const angleZ = viewAngle - (theta * selectedIndex);
-            
             wheelContent.style.transform = `rotate(${angleZ}deg)`;
 
             document.querySelectorAll('.wheel-item').forEach((item, i) => {
@@ -353,12 +394,16 @@
             });
         }
 
-        // --- 统一交互逻辑 (触控 & 滚轮) ---
+        // --- 交互逻辑 ---
         let startX = 0, startY = 0;
         let isDragging = false;
 
         function handleStart(e) {
             isDragging = true;
+            // 阻止默认行为以防止滚动冲突，特别是对轮盘操作
+            if (e.target.closest('.wheel-stage')) {
+                 e.preventDefault();
+            }
             startX = e.touches ? e.touches[0].clientX : e.clientX;
             startY = e.touches ? e.touches[0].clientY : e.clientY;
         }
@@ -372,38 +417,39 @@
             const diffX = startX - endX;
             const diffY = startY - endY;
 
-            if (Math.abs(diffX) > 30 || Math.abs(diffY) > 30) {
-                // 智能判断方向：
-                // 如果是左右滑，或者在左下角区域往右上滑
+            // 降低触发阈值，使滑动更灵敏
+            if (Math.abs(diffX) > 20 || Math.abs(diffY) > 20) {
                 if (Math.abs(diffX) > Math.abs(diffY)) {
+                    // 左右滑动
                     if (diffX > 0) selectedIndex++; else selectedIndex--;
                 } else {
-                    // 垂直方向：向上滑=下一个
+                    // 上下滑动 (向上滑=下一个，符合直觉)
                     if (diffY > 0) selectedIndex++; else selectedIndex--;
                 }
                 rotateAll();
             }
         }
 
-        const app = document.body; // 监听整个body
-        app.addEventListener('touchstart', handleStart, {passive: true});
-        app.addEventListener('touchend', handleEnd, {passive: true});
+        const app = document.body;
+        // 使用 passive: false 以便在需要时阻止默认行为(如轮盘上的滚动)
+        app.addEventListener('touchstart', handleStart, {passive: false});
+        app.addEventListener('touchend', handleEnd, {passive: false});
         app.addEventListener('mousedown', handleStart);
         app.addEventListener('mouseup', handleEnd);
 
-        // 滚轮支持
+        // 滚轮支持 (防抖优化)
         let timer;
         window.onwheel = (e) => {
+            e.preventDefault(); // 阻止页面滚动
             clearTimeout(timer);
             timer = setTimeout(() => {
                 if (e.deltaY > 0) selectedIndex++; else selectedIndex--;
                 rotateAll();
-            }, 60);
+            }, 50); // 更快的响应
         };
 
         window.onresize = () => { updateLayout(); rotateAll(); };
 
-        // 启动
         init();
 
     </script>
