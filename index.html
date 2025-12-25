@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>M HUB - 灵动导航</title>
     <style>
@@ -29,7 +30,6 @@
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            /* 4. 整体效果要灵动：添加流动渐变背景 */
             background: linear-gradient(-45deg, #f5f7fa, #c3cfe2, #a1c4fd, #d4fc79);
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
@@ -38,9 +38,11 @@
             flex-direction: column;
             align-items: center;
             height: 100vh;
-            overflow: hidden;
+            overflow: hidden; /* 禁止溢出滚动 */
             -webkit-font-smoothing: antialiased;
             user-select: none;
+            /* 关键修改：禁止所有原生触摸操作（如橡皮筋效果），确保“固定” */
+            touch-action: none; 
         }
 
         /* --- 头部 --- */
@@ -49,6 +51,8 @@
             text-align: center;
             z-index: 10;
             transition: all 0.3s;
+            /* 保持头部固定，不随内部flex挤压 */
+            flex-shrink: 0; 
         }
 
         h1 {
@@ -71,6 +75,7 @@
             align-items: center;
             position: relative;
             z-index: 5;
+            transition: transform 0.3s ease; /* 让布局调整更丝滑 */
         }
 
         .carousel {
@@ -78,7 +83,6 @@
             height: var(--card-height);
             position: absolute;
             transform-style: preserve-3d;
-            /* 4. 灵动效果：使用更有弹性的贝塞尔曲线 */
             transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
@@ -104,7 +108,6 @@
             color: var(--text-color);
             border: 1px solid rgba(255, 255, 255, 0.5);
             opacity: 0.25;
-            /* 4. 灵动效果：卡片自身的过渡也更有弹性 */
             transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
             cursor: pointer;
         }
@@ -113,7 +116,6 @@
             opacity: 1;
             box-shadow: 0 25px 50px rgba(9, 132, 227, 0.3);
             border: 2px solid rgba(9, 132, 227, 0.8);
-            /* 激活时轻微放大 */
             transform: scale(1.08); 
         }
 
@@ -138,17 +140,16 @@
             height: calc(var(--wheel-radius) * 2);
             z-index: 50;
             pointer-events: all;
-            touch-action: none;
+            /* 轮盘区域允许触摸交互，但上面body已全局禁止默认行为 */
         }
 
-        /* 3. 透明轮盘：去掉了背景色和浓重阴影，只留极细的装饰线 */
         .wheel-bg {
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
             border-radius: 50%;
             border: 1px solid var(--wheel-border);
-            background: none; /* 透明背景 */
+            background: none;
             box-shadow: none;
             pointer-events: none;
             opacity: 0.6;
@@ -159,7 +160,6 @@
             height: 100%;
             position: relative;
             border-radius: 50%;
-            /* 4. 灵动效果：轮盘旋转也用弹性过渡 */
             transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
@@ -174,24 +174,22 @@
             align-items: center;
             justify-content: flex-end;
             cursor: pointer;
-            pointer-events: none; /* 让点击事件穿透到文字盒子上 */
+            pointer-events: none;
         }
         
         .wheel-item > * {
-             pointer-events: auto; /* 恢复文字盒子的点击 */
+             pointer-events: auto;
         }
 
-        /* 3. 轮盘方框样式：给域名加上方框 */
         .wheel-text-box {
             display: block;
-            /* 方框样式 */
             background: rgba(255, 255, 255, 0.25);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             border: 1px solid rgba(255, 255, 255, 0.4);
             padding: 10px 20px;
-            border-radius: 30px; /* 圆角方框 */
-            margin-right: 30px; /* 距离圆心的位置 */
+            border-radius: 30px;
+            margin-right: 30px;
             
             font-size: 14px;
             font-weight: 600;
@@ -199,20 +197,17 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             opacity: 0.7;
-            /* 4. 灵动效果：方框的激活过渡非常Q弹 */
-            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.26.5, 1.55);
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             white-space: nowrap;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
 
-        /* 3. 滑动选择的对象加大：显著放大激活项 */
         .wheel-item.active .wheel-text-box {
             color: var(--accent-color);
             background: rgba(255, 255, 255, 0.95);
             border-color: var(--accent-color);
             opacity: 1;
             font-weight: 800;
-            /* 核心：显著放大 1.5 倍，并稍微向外位移，突出显示 */
             transform: scale(1.5) translateX(10px);
             box-shadow: 0 10px 30px rgba(9, 132, 227, 0.4);
         }
@@ -230,37 +225,55 @@
             text-shadow: 0 1px 2px rgba(255,255,255,0.5);
         }
 
-        /* --- 1. 适配不同页面，手机浏览器中心卡片被挡了 --- */
+        /* --- 手机端核心适配 --- */
         @media (max-width: 768px) {
             :root {
-                /* 适当减小卡片尺寸以适应小屏 */
-                --card-width: 210px;
-                --card-height: 125px;
-                --wheel-radius: 180px;
+                /* 稍微减小卡片尺寸 */
+                --card-width: 200px;
+                --card-height: 120px;
+                /* 稍微减小轮盘半径，减少遮挡面积 */
+                --wheel-radius: 160px;
             }
+            
             header {
-                /* 减少头部内边距 */
-                padding: 25px 0 10px;
+                /* 压缩头部空间 */
+                padding: 20px 0 10px;
             }
+            
+            h1 {
+                /* 减小标题字号 */
+                font-size: 1.5rem;
+            }
+
             .scene {
-                /* 关键：将整个 3D 场景向上偏移，防止被 Safari 等浏览器的底部栏或自身头部遮挡 */
-                transform: translateY(-30px);
-                /* 确保对齐 */
+                /* 核心修改：使用 vh 单位将整个 3D 舞台大幅向上提 */
+                /* -20vh 意味着向上移动屏幕高度的 20%，给下方轮盘留出巨大空间 */
+                transform: translateY(-20vh);
+                /* 确保内容对齐 */
                 align-items: center; 
             }
+            
             .wheel-stage {
+                /* 轮盘保持在左下角，但略微调整位置 */
                 bottom: -40px;
                 left: -40px;
             }
-            /* 手机端调整方框大小和间距 */
+            
             .wheel-text-box {
                 font-size: 12px;
-                padding: 8px 16px;
-                margin-right: 20px;
+                padding: 6px 14px;
+                margin-right: 15px; /* 减小离圆心的距离 */
             }
-            /* 手机端激活态也相应调整，保持放大效果 */
+            
             .wheel-item.active .wheel-text-box {
-                transform: scale(1.4) translateX(8px);
+                transform: scale(1.4) translateX(5px);
+            }
+            
+            /* 提示语下移或隐藏，避免视觉杂乱，这里选择保留但缩小 */
+            .tips {
+                font-size: 0.7rem;
+                bottom: 20px;
+                opacity: 0.6;
             }
         }
     </style>
@@ -284,7 +297,6 @@
     <div class="tips">滑动屏幕 · 转动轮盘</div>
 
     <script>
-        // 2. 域名home改为gooooo
         const domains = [
             { title: 'gooooo', desc: '主页', url: 'https://gooooo.top' },
             { title: 'GitHub', desc: '代码', url: 'https://github.com' },
@@ -315,12 +327,13 @@
                     <div class="card-title">${domain.title}</div>
                     <div class="card-desc">${domain.desc}</div>
                 `;
-                card.onclick = (e) => {
+                // 修复点击问题：防止拖拽结束时误触
+                card.addEventListener('click', (e) => {
                     if (getNormalizedIndex() !== index) {
                         e.preventDefault();
                         rotateTo(index);
                     }
-                };
+                });
                 carousel.appendChild(card);
             });
 
@@ -329,14 +342,16 @@
             domains.forEach((domain, index) => {
                 const item = document.createElement('div');
                 item.className = 'wheel-item';
-                // 使用新的方框结构 span.wheel-text-box
                 item.innerHTML = `<span class="wheel-text-box">${domain.title}</span>`;
                 
                 const angle = theta * index;
                 item.style.transform = `rotate(${angle}deg)`;
                 
-                // 点击事件绑定在 item 上，但通过 CSS 让 span 响应
-                item.onclick = () => rotateTo(index);
+                // 轮盘点击逻辑
+                item.onclick = (e) => {
+                    e.stopPropagation(); // 防止冒泡触发滑动逻辑
+                    rotateTo(index);
+                };
                 wheelContent.appendChild(item);
             });
 
@@ -346,7 +361,7 @@
 
         function updateLayout() {
             const cardWidth = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-width'));
-            // 调整了计算系数，让卡片分布更合理
+            // 动态计算半径，确保卡片不重叠且距离适中
             const radius = Math.round((cardWidth / 2) / Math.tan(Math.PI / cellCount) * 1.6);
             
             const cards = document.querySelectorAll('.card');
@@ -365,7 +380,6 @@
         function rotateTo(targetIndex) {
             let currentIdx = getNormalizedIndex();
             let diff = targetIndex - currentIdx;
-            // 寻找最短路径
             if (diff > cellCount / 2) diff -= cellCount;
             if (diff < -cellCount / 2) diff += cellCount;
             selectedIndex += diff;
@@ -384,7 +398,6 @@
             });
 
             // 轮盘旋转
-            // 调整最佳视角角度，使激活项指向左上侧方
             const viewAngle = -35; 
             const angleZ = viewAngle - (theta * selectedIndex);
             wheelContent.style.transform = `rotate(${angleZ}deg)`;
@@ -397,13 +410,11 @@
         // --- 交互逻辑 ---
         let startX = 0, startY = 0;
         let isDragging = false;
+        const threshold = 10; // 滑动阈值
 
         function handleStart(e) {
+            // 不再阻止默认，由 touch-action: none 控制
             isDragging = true;
-            // 阻止默认行为以防止滚动冲突，特别是对轮盘操作
-            if (e.target.closest('.wheel-stage')) {
-                 e.preventDefault();
-            }
             startX = e.touches ? e.touches[0].clientX : e.clientX;
             startY = e.touches ? e.touches[0].clientY : e.clientY;
         }
@@ -417,13 +428,12 @@
             const diffX = startX - endX;
             const diffY = startY - endY;
 
-            // 降低触发阈值，使滑动更灵敏
-            if (Math.abs(diffX) > 20 || Math.abs(diffY) > 20) {
+            if (Math.abs(diffX) > threshold || Math.abs(diffY) > threshold) {
                 if (Math.abs(diffX) > Math.abs(diffY)) {
                     // 左右滑动
                     if (diffX > 0) selectedIndex++; else selectedIndex--;
                 } else {
-                    // 上下滑动 (向上滑=下一个，符合直觉)
+                    // 上下滑动
                     if (diffY > 0) selectedIndex++; else selectedIndex--;
                 }
                 rotateAll();
@@ -431,21 +441,25 @@
         }
 
         const app = document.body;
-        // 使用 passive: false 以便在需要时阻止默认行为(如轮盘上的滚动)
+        
+        // 触摸事件
         app.addEventListener('touchstart', handleStart, {passive: false});
         app.addEventListener('touchend', handleEnd, {passive: false});
+        
+        // 鼠标事件
         app.addEventListener('mousedown', handleStart);
         app.addEventListener('mouseup', handleEnd);
 
-        // 滚轮支持 (防抖优化)
+        // 滚轮支持
         let timer;
         window.onwheel = (e) => {
-            e.preventDefault(); // 阻止页面滚动
+            // 尽管 body overflow hidden，加这句更保险
+            e.preventDefault(); 
             clearTimeout(timer);
             timer = setTimeout(() => {
                 if (e.deltaY > 0) selectedIndex++; else selectedIndex--;
                 rotateAll();
-            }, 50); // 更快的响应
+            }, 50);
         };
 
         window.onresize = () => { updateLayout(); rotateAll(); };
