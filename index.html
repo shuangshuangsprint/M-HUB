@@ -10,8 +10,11 @@
             --text-color: #2d3436;
             --accent-color: #0984e3;
             --card-bg: rgba(255, 255, 255, 0.85);
-            --card-width: 260px;
-            --card-height: 150px;
+            
+            /* 卡片尺寸 */
+            --card-width: 180px;
+            --card-height: 100px;
+            
             --perspective: 1200px;
             
             /* 轮盘配置 */
@@ -38,20 +41,17 @@
             flex-direction: column;
             align-items: center;
             height: 100vh;
-            overflow: hidden; /* 禁止溢出滚动 */
+            overflow: hidden; 
             -webkit-font-smoothing: antialiased;
             user-select: none;
-            /* 关键修改：禁止所有原生触摸操作（如橡皮筋效果），确保“固定” */
             touch-action: none; 
         }
 
-        /* --- 头部 --- */
         header {
             padding: 40px 0 20px;
             text-align: center;
             z-index: 10;
             transition: all 0.3s;
-            /* 保持头部固定，不随内部flex挤压 */
             flex-shrink: 0; 
         }
 
@@ -65,7 +65,6 @@
         }
         h1 span { color: var(--accent-color); font-weight: 800; }
 
-        /* --- 3D 舞台 --- */
         .scene {
             flex: 1;
             width: 100%;
@@ -75,7 +74,7 @@
             align-items: center;
             position: relative;
             z-index: 5;
-            transition: transform 0.3s ease; /* 让布局调整更丝滑 */
+            transition: transform 0.3s ease;
         }
 
         .carousel {
@@ -86,7 +85,6 @@
             transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        /* --- 卡片 --- */
         .card {
             position: absolute;
             width: var(--card-width);
@@ -94,14 +92,14 @@
             background: var(--card-bg);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
-            border-radius: 20px;
+            border-radius: 16px;
             box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 20px;
+            padding: 10px;
             box-sizing: border-box;
             backface-visibility: hidden;
             text-decoration: none;
@@ -114,24 +112,24 @@
 
         .card.active {
             opacity: 1;
-            box-shadow: 0 25px 50px rgba(9, 132, 227, 0.3);
+            box-shadow: 0 20px 40px rgba(9, 132, 227, 0.25);
             border: 2px solid rgba(9, 132, 227, 0.8);
-            transform: scale(1.08); 
+            transform: scale(1.05); 
         }
 
         .card-title {
-            font-size: 1.6rem;
+            font-size: 1.2rem; 
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
 
         .card-desc {
-            font-size: 0.9rem;
+            font-size: 0.75rem;
             color: #636e72;
             font-weight: 500;
         }
 
-        /* --- 左下角 1/4 轮盘 --- */
+        /* --- 左下角 1/4 轮盘核心修改 --- */
         .wheel-stage {
             position: fixed;
             bottom: -60px;
@@ -140,7 +138,6 @@
             height: calc(var(--wheel-radius) * 2);
             z-index: 50;
             pointer-events: all;
-            /* 轮盘区域允许触摸交互，但上面body已全局禁止默认行为 */
         }
 
         .wheel-bg {
@@ -167,14 +164,22 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 50%;
-            height: 0;
-            transform-origin: 0 0;
+            width: 50%; /* 它是半径的长度 */
+            height: 0;  /* 高度为0，作为对齐轴线 */
+            transform-origin: 0 0; /* 围绕圆心旋转 */
+            
             display: flex;
-            align-items: center;
-            justify-content: flex-end;
+            align-items: center; /* 垂直居中 */
+            
+            /* --- 核心修改点 1：改为从左侧开始排列 --- */
+            justify-content: flex-start; 
+            
+            /* --- 核心修改点 2：设置内圆半径（文字距离圆心的距离）--- */
+            padding-left: 80px; 
+            
             cursor: pointer;
             pointer-events: none;
+            box-sizing: border-box; /* 确保padding计算在内 */
         }
         
         .wheel-item > * {
@@ -187,9 +192,11 @@
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             border: 1px solid rgba(255, 255, 255, 0.4);
-            padding: 10px 20px;
+            padding: 8px 16px; /* 调整一下内边距更紧凑 */
             border-radius: 30px;
-            margin-right: 30px;
+            
+            /* 去掉了 margin-right，因为不再靠右对齐 */
+            margin-right: 0; 
             
             font-size: 14px;
             font-weight: 600;
@@ -200,6 +207,9 @@
             transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             white-space: nowrap;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            
+            /* --- 核心修改点 3：确保放大时向右延伸，保持左侧对齐 --- */
+            transform-origin: left center;
         }
 
         .wheel-item.active .wheel-text-box {
@@ -208,7 +218,10 @@
             border-color: var(--accent-color);
             opacity: 1;
             font-weight: 800;
-            transform: scale(1.5) translateX(10px);
+            
+            /* 修改动画效果，稍微往右移一点点增加动感 */
+            transform: scale(1.4) translateX(5px);
+            
             box-shadow: 0 10px 30px rgba(9, 132, 227, 0.4);
         }
 
@@ -225,56 +238,45 @@
             text-shadow: 0 1px 2px rgba(255,255,255,0.5);
         }
 
-        /* --- 手机端核心适配 --- */
+        /* --- 手机端适配 --- */
         @media (max-width: 768px) {
             :root {
-                /* 稍微减小卡片尺寸 */
-                --card-width: 200px;
-                --card-height: 120px;
-                /* 稍微减小轮盘半径，减少遮挡面积 */
+                --card-width: 140px;
+                --card-height: 80px;
                 --wheel-radius: 160px;
             }
             
-            header {
-                /* 压缩头部空间 */
-                padding: 20px 0 10px;
-            }
-            
-            h1 {
-                /* 减小标题字号 */
-                font-size: 1.5rem;
-            }
+            header { padding: 20px 0 10px; }
+            h1 { font-size: 1.5rem; }
 
             .scene {
-                /* 核心修改：使用 vh 单位将整个 3D 舞台大幅向上提 */
-                /* -20vh 意味着向上移动屏幕高度的 20%，给下方轮盘留出巨大空间 */
                 transform: translateY(-20vh);
-                /* 确保内容对齐 */
                 align-items: center; 
             }
             
             .wheel-stage {
-                /* 轮盘保持在左下角，但略微调整位置 */
                 bottom: -40px;
                 left: -40px;
+            }
+
+            /* --- 核心修改点 4：手机端减小内圆半径 --- */
+            .wheel-item {
+                padding-left: 60px; 
             }
             
             .wheel-text-box {
                 font-size: 12px;
                 padding: 6px 14px;
-                margin-right: 15px; /* 减小离圆心的距离 */
             }
             
-            .wheel-item.active .wheel-text-box {
-                transform: scale(1.4) translateX(5px);
-            }
-            
-            /* 提示语下移或隐藏，避免视觉杂乱，这里选择保留但缩小 */
             .tips {
                 font-size: 0.7rem;
                 bottom: 20px;
                 opacity: 0.6;
             }
+            
+            .card-title { font-size: 1rem; }
+            .card-desc { font-size: 0.65rem; }
         }
     </style>
 </head>
@@ -301,11 +303,20 @@
             { title: 'gooooo', desc: '主页', url: 'https://gooooo.top' },
             { title: 'GitHub', desc: '代码', url: 'https://github.com' },
             { title: 'ChatGPT', desc: 'AI', url: 'https://chat.openai.com' },
-            { title: 'Bilibili', desc: '视频', url: 'https://www.bilibili.com' },
             { title: 'Google', desc: '搜索', url: 'https://www.google.com' },
             { title: 'YouTube', desc: '媒体', url: 'https://www.youtube.com' },
-            { title: 'Vercel', desc: '部署', url: 'https://vercel.com' },
-            { title: 'Twitter', desc: '社交', url: 'https://twitter.com' }
+            { title: 'booo', desc: '域名', url: 'https://booo.de5.net' },
+            { title: 'goxx', desc: '域名', url: 'https://goxx.de5.net' },
+            { title: 'ioxx', desc: '域名', url: 'https://ioxx.de5.net' },
+            { title: 'locks', desc: '域名', url: 'https://locks.de5.net' },
+            { title: 'mhub', desc: '域名', url: 'https://mhub.de5.net' },
+            { title: 'smik', desc: '域名', url: 'https://smik.de5.net' },
+            { title: 'sprint', desc: '域名', url: 'https://sprint.de5.net' },
+            { title: 'sprintss', desc: '域名', url: 'https://sprintss.dpdns.org' },
+            { title: 'ssprint', desc: '域名', url: 'https://ssprint.dpdns.org' },
+            { title: 'toies', desc: '域名', url: 'https://toies.de5.net' },
+            { title: 'tooo', desc: '域名', url: 'https://tooo.de5.net' },
+            { title: 'yoooo', desc: '域名', url: 'https://yoooo.de5.net' }
         ];
 
         const carousel = document.getElementById('carousel');
@@ -361,7 +372,7 @@
 
         function updateLayout() {
             const cardWidth = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-width'));
-            // 动态计算半径，确保卡片不重叠且距离适中
+            // 动态计算半径
             const radius = Math.round((cardWidth / 2) / Math.tan(Math.PI / cellCount) * 1.6);
             
             const cards = document.querySelectorAll('.card');
@@ -410,10 +421,9 @@
         // --- 交互逻辑 ---
         let startX = 0, startY = 0;
         let isDragging = false;
-        const threshold = 10; // 滑动阈值
+        const threshold = 10; 
 
         function handleStart(e) {
-            // 不再阻止默认，由 touch-action: none 控制
             isDragging = true;
             startX = e.touches ? e.touches[0].clientX : e.clientX;
             startY = e.touches ? e.touches[0].clientY : e.clientY;
@@ -430,10 +440,8 @@
 
             if (Math.abs(diffX) > threshold || Math.abs(diffY) > threshold) {
                 if (Math.abs(diffX) > Math.abs(diffY)) {
-                    // 左右滑动
                     if (diffX > 0) selectedIndex++; else selectedIndex--;
                 } else {
-                    // 上下滑动
                     if (diffY > 0) selectedIndex++; else selectedIndex--;
                 }
                 rotateAll();
@@ -442,18 +450,13 @@
 
         const app = document.body;
         
-        // 触摸事件
         app.addEventListener('touchstart', handleStart, {passive: false});
         app.addEventListener('touchend', handleEnd, {passive: false});
-        
-        // 鼠标事件
         app.addEventListener('mousedown', handleStart);
         app.addEventListener('mouseup', handleEnd);
 
-        // 滚轮支持
         let timer;
         window.onwheel = (e) => {
-            // 尽管 body overflow hidden，加这句更保险
             e.preventDefault(); 
             clearTimeout(timer);
             timer = setTimeout(() => {
